@@ -18,20 +18,11 @@
     <div class="game-ui hide">
 
       <div class="left-ui">
-        <span>00:24:417</span>
+        <span id="timer">00:24:417</span>
       </div>
 
-      <div class="right-ui">
-        <p><span>#1</span> <span class="rocket-a">Username1</span></p>
-        <p><span>#2</span> <span class="rocket-b">Username2</span></p>
-        <p><span>#3</span> <span class="rocket-c">Username3</span></p>
-        <p><span>#4</span> <span class="rocket-d">Username4</span></p>
-        <p><span>#5</span> <span class="rocket-e">Username5</span></p>
-        <p><span>#6</span> <span class="rocket-f">Username6</span></p>
-        <p><span>#7</span> <span class="rocket-g">Username7</span></p>
-        <p><span>#8</span> <span class="rocket-h">Username8</span></p>
-        <p><span>#9</span> <span class="rocket-i">Username9</span></p>
-        <p><span>#10</span> <span class="rocket-j">Username10</span></p>
+      <div id="rank-panel" class="right-ui">
+        <!-- <p><span>#1</span> <span class="rocket-1">Username1</span></p> -->
       </div>
 
       <img class="game-over-img" src="./public/assets/img/placement-1.png">
@@ -52,6 +43,7 @@
     <button id="play">Play</button>
     <button id="finish">Finish</button>
     <button id="reset">Reset</button>
+    <button id="random-rank">Random Rank</button>
   </div>
   <script type="module" src="/src/UiHandler.ts"></script>
 </body>

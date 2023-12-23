@@ -1,6 +1,10 @@
 // handle game ui, and trigger game facility
 
-import { setup, onPlay, onFinish, onReset } from "./main";
+
+let timer: any = undefined
+
+import { setup, onPlay, onFinish, onReset, updateGamePlayerRanks, setupPlayers } from "./main";
+import { calculateElapsedTime, usernames } from "./utils";
 
 const progressEle = document.querySelector(
   "#game-progress-load"
@@ -24,9 +28,73 @@ const gameOverElements = document.querySelectorAll(
   "#canvas-container .game-over-img"
 );
 
+const rankPanel = document.querySelector("#rank-panel") as HTMLDivElement;
+
+export interface PlayerRank {
+  name: string;
+  rank: number;
+  className: string;
+}
+
+let playerRanks = usernames.map((item, index) => {
+  const i: PlayerRank = {
+    name: item,
+    rank: index + 1,
+    className: "rocket-" + (index + 1),
+  };
+
+  return i;
+});
+
+const rankItem = `<span class="rank">#1</span> <span class="name">Username1</span>`;
+function createPlayers() {
+  // Remove all child elements from the div
+  while (rankPanel.firstChild) {
+    rankPanel.removeChild(rankPanel.firstChild);
+  }
+
+  playerRanks.forEach((element) => {
+    const para = document.createElement("p");
+    para.innerHTML = rankItem;
+    para.querySelector(".rank")!.innerHTML = "#" + element.rank;
+    para.querySelector(".name")!.innerHTML = element.name;
+    para.querySelector(".name")!.className = element.className;
+
+    rankPanel.appendChild(para);
+  });
+}
+
+function updatePlayerRanks(ranks: Array<PlayerRank>) {
+  playerRanks = [...ranks];
+  createPlayers();
+  updateGamePlayerRanks(playerRanks)
+}
 
 
-export function clearGameOverScreen(){
+
+
+const timerEle = document.querySelector("#timer") as HTMLParagraphElement
+let startTime = 0
+function onTimerChange(){
+  timerEle.innerText = calculateElapsedTime(startTime)
+}
+
+
+export function resetTimer(){
+  stopTimer()
+  timerEle.innerText = "00:00:000"
+}
+
+export function stopTimer(){
+  clearInterval(timer)
+}
+
+export function startTimer(){
+  startTime = new Date().getTime()
+  timer = setInterval(onTimerChange, 1)
+}
+
+export function clearGameOverScreen() {
   for (const iterator of gameOverElements) {
     iterator.classList.remove("animate");
   }
@@ -38,14 +106,18 @@ export function onGameOver(rank: number) {
   for (const iterator of gameOverElements) {
     if (index == rank - 1) {
       iterator.classList.add("animate");
-      return
+      return;
     }
 
     index++;
   }
 }
 
-window.addEventListener("load", setup);
+window.addEventListener("load", () => {
+  createPlayers();
+  setupPlayers(playerRanks)
+  setup();
+});
 
 (document.querySelector("#play") as HTMLButtonElement).addEventListener(
   "click",
@@ -59,5 +131,24 @@ window.addEventListener("load", setup);
   "click",
   () => {
     onFinish(1);
+  }
+);
+
+(document.querySelector("#random-rank") as HTMLButtonElement).addEventListener(
+  "click",
+  () => {
+    // generate random rank
+
+    const tempArr = playerRanks.slice();
+    for (let i = tempArr.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [tempArr[i], tempArr[j]] = [tempArr[j], tempArr[i]];
+    }
+
+    const newRanks = tempArr.map((item, index) => {
+      return { name: item.name, rank: index + 1, className: item.className };
+    });
+
+    updatePlayerRanks(newRanks);
   }
 );

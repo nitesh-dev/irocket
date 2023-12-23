@@ -1,7 +1,15 @@
 // store game business logic
 
 import * as PIXI from "pixi.js";
-import { clearGameOverScreen, onGameOver, onLoadProgress } from "./UiHandler";
+import {
+  PlayerRank,
+  clearGameOverScreen,
+  onGameOver,
+  onLoadProgress,
+  resetTimer,
+  startTimer,
+  stopTimer,
+} from "./UiHandler";
 import {
   getFinalBackTexturesUrl,
   getFinalRocketTexturesUrl,
@@ -68,7 +76,6 @@ export function setup() {
   // (app.view as HTMLCanvasElement).style.backgroundColor = "transparent"
 
   canvasContainer.appendChild(app.view as any);
-
   onStart();
 }
 
@@ -261,6 +268,7 @@ export function onReset() {
 
   gameState = "ideal";
   resetCount += 1;
+  resetTimer();
 
   clearGameOverScreen();
   createDeleteRocketFinishGroup(true);
@@ -317,6 +325,7 @@ function onFinishLineAnimationComplete() {
   }
 
   gameState = "finish";
+  stopTimer();
   createDeleteRaceLoopGroup(true);
   createDeleteRocketFinishGroup(false);
 }
@@ -328,6 +337,7 @@ function onIntroAnimationComplete() {
   }
 
   gameState = "race";
+  startTimer();
   createDeleteIntro(true);
   createDeleteRaceLoopGroup(false);
 }
@@ -397,14 +407,99 @@ function createDeleteIntro(isDelete: boolean) {
   world.addChild(intro);
 }
 
-let raceLoopRocketsArr = new Array<PIXI.AnimatedSprite>();
+let playerRanks = Array<PlayerRank>();
+export function setupPlayers(ranks: Array<PlayerRank>) {
+  playerRanks = ranks.slice();
+}
+
+let raceLoopRocketsArr = new Array<{
+  player: PlayerRank;
+  rocket: PIXI.AnimatedSprite;
+  stopFrame: number;
+  oldDirection: "up" | "down";
+}>();
+let isRocketRankChangeAllowed = false;
+
+// max index 29
+export function updateGamePlayerRanks(ranks: Array<PlayerRank>) {
+  if (!isRocketRankChangeAllowed) {
+    print("Rank change not allowed");
+    return;
+  }
+
+  const frameInv = Math.floor(30 / ranks.length);
+
+  for (const element of raceLoopRocketsArr) {
+    const index = ranks.findIndex((item) => item.name == element.player.name);
+    if (index != -1) {
+      const gotoFrame = (ranks.length - ranks[index].rank) * frameInv;
+
+      let direction: "up" | "down" = "up";
+      if (element.rocket.currentFrame > gotoFrame) direction = "down";
+
+      let textures = Array();
+
+      element.player.rank = ranks[index].rank;
+
+      if (element.player.className == "rocket-1") {
+        textures = raceLoopRocketTextures[0].slice();
+      } else if (element.player.className == "rocket-2") {
+        textures = raceLoopRocketTextures[1].slice();
+      } else if (element.player.className == "rocket-3") {
+        textures = raceLoopRocketTextures[2].slice();
+      } else if (element.player.className == "rocket-4") {
+        textures = raceLoopRocketTextures[3].slice();
+      } else if (element.player.className == "rocket-5") {
+        textures = raceLoopRocketTextures[4].slice();
+      } else if (element.player.className == "rocket-6") {
+        textures = raceLoopRocketTextures[5].slice();
+      } else if (element.player.className == "rocket-7") {
+        textures = raceLoopRocketTextures[6].slice();
+      } else if (element.player.className == "rocket-8") {
+        textures = raceLoopRocketTextures[7].slice();
+      } else if (element.player.className == "rocket-9") {
+        textures = raceLoopRocketTextures[8].slice();
+      } else if (element.player.className == "rocket-10") {
+        textures = raceLoopRocketTextures[9].slice();
+      }
+
+      // console.log(element.player.name, element.stopFrame, gotoFrame);
+
+      console.log(direction);
+      if (direction == "up") {
+        element.rocket.textures = textures;
+        if (element.oldDirection == "down") {
+          element.rocket.gotoAndStop(
+            element.rocket.totalFrames - 1 - element.rocket.currentFrame
+          );
+          element.oldDirection = "up";
+        }
+        element.stopFrame = gotoFrame;
+        element.rocket.play();
+      } else {
+        element.rocket.textures = textures.reverse();
+        if (element.oldDirection == "up") {
+          element.rocket.gotoAndStop(
+            element.rocket.totalFrames - 1 - element.rocket.currentFrame
+          );
+          element.oldDirection = "down";
+        }
+        element.stopFrame = element.rocket.totalFrames - 1 - gotoFrame;
+        element.rocket.play();
+      }
+
+
+    }
+  }
+}
 
 function createDeleteRaceLoopGroup(isDelete: boolean) {
+  isRocketRankChangeAllowed = false;
   if (isDelete) {
     if (raceLoopContainer) {
       // remove listener
       if (raceLoopRocketsArr.length > 0) {
-        raceLoopRocketsArr[0].onComplete = () => {
+        raceLoopRocketsArr[0].rocket.onComplete = () => {
           print("skipped listener");
         };
       }
@@ -464,37 +559,128 @@ function createDeleteRaceLoopGroup(isDelete: boolean) {
   const rocket10 = new PIXI.AnimatedSprite(raceLoopRocketTextures[9]);
   rocket10.x = -halfW + 1320;
 
-  raceLoopRocketsArr = new Array<PIXI.AnimatedSprite>();
-  raceLoopRocketsArr.push(rocket1);
-  raceLoopRocketsArr.push(rocket2);
-  raceLoopRocketsArr.push(rocket3);
-  raceLoopRocketsArr.push(rocket4);
-  raceLoopRocketsArr.push(rocket5);
-  raceLoopRocketsArr.push(rocket6);
-  raceLoopRocketsArr.push(rocket7);
-  raceLoopRocketsArr.push(rocket8);
-  raceLoopRocketsArr.push(rocket9);
-  raceLoopRocketsArr.push(rocket10);
+  raceLoopRocketsArr = new Array<{
+    player: PlayerRank;
+    rocket: PIXI.AnimatedSprite;
+    stopFrame: number;
+    oldDirection: "up" | "down";
+  }>();
+
+  playerRanks.forEach((element) => {
+    if (element.className == "rocket-1") {
+      raceLoopRocketsArr.push({
+        player: element,
+        rocket: rocket1,
+        stopFrame: 0,
+        oldDirection: "up",
+      });
+    } else if (element.className == "rocket-2") {
+      raceLoopRocketsArr.push({
+        player: element,
+        rocket: rocket2,
+        stopFrame: 0,
+        oldDirection: "up",
+      });
+    } else if (element.className == "rocket-3") {
+      raceLoopRocketsArr.push({
+        player: element,
+        rocket: rocket3,
+        stopFrame: 0,
+        oldDirection: "up",
+      });
+    } else if (element.className == "rocket-4") {
+      raceLoopRocketsArr.push({
+        player: element,
+        rocket: rocket4,
+        stopFrame: 0,
+        oldDirection: "up",
+      });
+    } else if (element.className == "rocket-5") {
+      raceLoopRocketsArr.push({
+        player: element,
+        rocket: rocket5,
+        stopFrame: 0,
+        oldDirection: "up",
+      });
+    } else if (element.className == "rocket-6") {
+      raceLoopRocketsArr.push({
+        player: element,
+        rocket: rocket6,
+        stopFrame: 0,
+        oldDirection: "up",
+      });
+    } else if (element.className == "rocket-7") {
+      raceLoopRocketsArr.push({
+        player: element,
+        rocket: rocket7,
+        stopFrame: 0,
+        oldDirection: "up",
+      });
+    } else if (element.className == "rocket-8") {
+      raceLoopRocketsArr.push({
+        player: element,
+        rocket: rocket8,
+        stopFrame: 0,
+        oldDirection: "up",
+      });
+    } else if (element.className == "rocket-9") {
+      raceLoopRocketsArr.push({
+        player: element,
+        rocket: rocket9,
+        stopFrame: 0,
+        oldDirection: "up",
+      });
+    } else if (element.className == "rocket-10") {
+      raceLoopRocketsArr.push({
+        player: element,
+        rocket: rocket10,
+        stopFrame: 0,
+        oldDirection: "up",
+      });
+    }
+  });
 
   raceLoopRocketsArr.forEach((element) => {
-    element.scale.set(0.9, 0.9);
-    element.anchor.set(0.5, 1);
-    element.y = rocketY;
-    element.loop = false;
-    element.animationSpeed = gameAnimSpeed;
-    element.play();
-    raceLoopContainer.addChild(element);
+    element.rocket.scale.set(0.9, 0.9);
+    element.rocket.anchor.set(0.5, 1);
+    element.rocket.y = rocketY;
+    element.rocket.loop = false;
+    element.rocket.animationSpeed = gameAnimSpeed;
+    element.rocket.play();
+    element.rocket.onFrameChange = (cFrame: number) => {
+      // console.log(num, element.player.className)
+      if (isRocketRankChangeAllowed) {
+        if (cFrame == element.stopFrame) {
+          element.rocket.stop();
+        }
+      }
+    };
+    raceLoopContainer.addChild(element.rocket);
   });
+
+  // rocket1.onFrameChange = (num: number) => {
+  //   console.log(num)
+  // }
+
+  print("Rank change allowed disabled");
 
   // play all rocket animation in rev order
   rocket1.onComplete = () => {
     setTimeout(() => {
       for (const child of raceLoopRocketsArr) {
-        child.textures = child.textures.slice().reverse();
-        child.gotoAndPlay(0);
+        child.rocket.textures = child.rocket.textures.slice().reverse();
+        child.rocket.gotoAndPlay(0);
       }
 
-      rocket1.onComplete = () => {};
+      rocket1.onComplete = () => {
+        if (isRocketRankChangeAllowed == false) {
+          for (const child of raceLoopRocketsArr) {
+            child.rocket.textures = child.rocket.textures.slice().reverse();
+          }
+        }
+        isRocketRankChangeAllowed = true;
+        print("Rank change allowed enabled");
+      };
     }, 1000);
   };
 

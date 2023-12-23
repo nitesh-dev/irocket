@@ -124,6 +124,10 @@ body {
 
 }
 
+.canvas-container .right-ui p{
+  transition: all 200ms;
+}
+
 .canvas-container .right-ui>p:nth-child(-n+3)>span:first-child{
   color: white !important;
 }
@@ -137,43 +141,43 @@ body {
   color: rgb(161, 161, 161);
 }
 
-.canvas-container .right-ui p span.rocket-a {
+.canvas-container .right-ui p span.rocket-1 {
   border-bottom: 2px solid #00b800;
 }
 
-.canvas-container .right-ui p span.rocket-b {
+.canvas-container .right-ui p span.rocket-2 {
   border-bottom: 2px solid #c41414;
 }
 
-.canvas-container .right-ui p span.rocket-c {
+.canvas-container .right-ui p span.rocket-3 {
   border-bottom: 2px solid #ffffff;
 }
 
-.canvas-container .right-ui p span.rocket-d {
+.canvas-container .right-ui p span.rocket-4 {
   border-bottom: 2px solid #ff8100;
 }
 
-.canvas-container .right-ui p span.rocket-e {
+.canvas-container .right-ui p span.rocket-5 {
   border-bottom: 2px solid #00d882;
 }
 
-.canvas-container .right-ui p span.rocket-f {
+.canvas-container .right-ui p span.rocket-6 {
   border-bottom: 2px solid #9b00a2;
 }
 
-.canvas-container .right-ui p span.rocket-g {
+.canvas-container .right-ui p span.rocket-7 {
   border-bottom: 2px solid #231bcc;
 }
 
-.canvas-container .right-ui p span.rocket-h {
+.canvas-container .right-ui p span.rocket-8 {
   border-bottom: 2px solid #ffff00;
 }
 
-.canvas-container .right-ui p span.rocket-i {
+.canvas-container .right-ui p span.rocket-9 {
   border-bottom: 2px solid #dc5cff;
 }
 
-.canvas-container .right-ui p span.rocket-j {
+.canvas-container .right-ui p span.rocket-10 {
   border-bottom: 2px solid #4dd6ff;
 }
 

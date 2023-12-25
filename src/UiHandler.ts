@@ -47,7 +47,7 @@ let playerRanks = usernames.map((item, index) => {
 });
 
 const rankItem = `<span class="rank">#1</span> <span class="name">Username1</span>`;
-function createPlayers() {
+export function createPlayers() {
   // Remove all child elements from the div
   while (rankPanel.firstChild) {
     rankPanel.removeChild(rankPanel.firstChild);
@@ -66,7 +66,6 @@ function createPlayers() {
 
 function updatePlayerRanks(ranks: Array<PlayerRank>) {
   playerRanks = [...ranks];
-  createPlayers();
   updateGamePlayerRanks(playerRanks)
 }
 

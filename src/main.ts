@@ -4,6 +4,7 @@ import * as PIXI from "pixi.js";
 import {
   PlayerRank,
   clearGameOverScreen,
+  createPlayers,
   onGameOver,
   onLoadProgress,
   resetTimer,
@@ -26,7 +27,7 @@ class Sprite extends PIXI.AnimatedSprite {
   to = -1;
   isPlay = false;
   deltaCounter = 0;
-  timeToReach=1
+  timeToReach = 1;
   constructor(textures: PIXI.Texture[], autoUpdate?: boolean) {
     super(textures, autoUpdate);
   }
@@ -540,9 +541,7 @@ function createDeleteRaceLoopGroup(isDelete: boolean) {
         stopFrame: 0,
         oldDirection: "up",
       });
-    }
-    
-    else if (element.className == "rocket-2") {
+    } else if (element.className == "rocket-2") {
       raceLoopRocketsArr.push({
         player: element,
         rocket: rocket2,
@@ -669,6 +668,8 @@ export function updateGamePlayerRanks(ranks: Array<PlayerRank>) {
     return;
   }
 
+  createPlayers();
+
   const frameInv = Math.floor(30 / ranks.length);
 
   for (const element of raceLoopRocketsArr) {
@@ -756,24 +757,37 @@ function createDeleteRocketFinishGroup(isDelete: boolean) {
 
   const finishRocketsGroupArray = Array<PIXI.AnimatedSprite>();
 
-  finishRocketsGroupArray.push(rocket1);
-  finishRocketsGroupArray.push(rocket2);
-  finishRocketsGroupArray.push(rocket3);
-  finishRocketsGroupArray.push(rocket4);
-  finishRocketsGroupArray.push(rocket5);
-  finishRocketsGroupArray.push(rocket6);
-  finishRocketsGroupArray.push(rocket7);
-  finishRocketsGroupArray.push(rocket8);
-  finishRocketsGroupArray.push(rocket9);
-  finishRocketsGroupArray.push(rocket10);
+  if (playerRanks.findIndex((item) => item.className == "rocket-1") != -1)
+    finishRocketsGroupArray.push(rocket1);
+  if (playerRanks.findIndex((item) => item.className == "rocket-2") != -1)
+    finishRocketsGroupArray.push(rocket2);
+  if (playerRanks.findIndex((item) => item.className == "rocket-3") != -1)
+    finishRocketsGroupArray.push(rocket3);
+  if (playerRanks.findIndex((item) => item.className == "rocket-4") != -1)
+    finishRocketsGroupArray.push(rocket4);
+  if (playerRanks.findIndex((item) => item.className == "rocket-5") != -1)
+    finishRocketsGroupArray.push(rocket5);
+  if (playerRanks.findIndex((item) => item.className == "rocket-6") != -1)
+    finishRocketsGroupArray.push(rocket6);
+  if (playerRanks.findIndex((item) => item.className == "rocket-7") != -1)
+    finishRocketsGroupArray.push(rocket7);
+  if (playerRanks.findIndex((item) => item.className == "rocket-8") != -1)
+    finishRocketsGroupArray.push(rocket8);
+  if (playerRanks.findIndex((item) => item.className == "rocket-9") != -1)
+    finishRocketsGroupArray.push(rocket9);
+  if (playerRanks.findIndex((item) => item.className == "rocket-10") != -1)
+    finishRocketsGroupArray.push(rocket10);
 
-  finishRocketsGroupArray.forEach((element) => {
+  const maxSpeed = 0.8;
+  const speedInv = maxSpeed - 0.3
+
+  finishRocketsGroupArray.forEach((element, index) => {
     element.anchor.set(0.5, 0);
     element.x = 0;
     element.loop = false;
-    element.animationSpeed = 0.3;
+    element.animationSpeed =  (1 - playerRanks[index].rank / playerRanks.length) * speedInv + 0.3;
+    element.play()
     finishRocketRaceContainer!!.addChild(element);
-    element.play();
   });
 
   world.addChild(finishRocketRaceContainer);

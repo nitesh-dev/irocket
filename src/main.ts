@@ -126,7 +126,7 @@ let isTestingMode = true;
 let gameState: "ideal" | "intro" | "race" | "finish-line" | "finish" | "final" =
   "ideal";
 
-const gameAnimSpeed = 0.2;
+const gameAnimSpeed = 0.4;
 
 // ---------------------------------------------- objects ------------------------------------------------------------
 
@@ -444,7 +444,7 @@ function createDeleteIntro(isDelete: boolean) {
   intro.x = 0;
   intro.y = 0;
   intro.loop = false;
-  intro.animationSpeed = gameAnimSpeed;
+  intro.animationSpeed = 0.3;
   intro.onComplete = onIntroAnimationComplete;
   world.addChild(intro);
 }

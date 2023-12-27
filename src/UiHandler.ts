@@ -104,7 +104,9 @@ export function onGameOver(rank: number) {
   let index = 0;
   for (const iterator of gameOverElements) {
     if (index == rank - 1) {
-      iterator.classList.add("animate");
+      setTimeout(() => {
+        iterator.classList.add("animate");
+      }, 1000)
       return;
     }
 

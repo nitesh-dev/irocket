@@ -81,6 +81,8 @@ function resize() {
     canvasContainer.clientWidth,
     canvasContainer.clientHeight
   );
+
+  updateWorldScale()
 }
 
 //  -------------------------------------------- Media query in js ------------------------------------
@@ -409,6 +411,12 @@ let finishRocketRaceContainer: PIXI.Container | null = null;
 let resetCount = 0;
 
 function setupWorld() {
+  updateWorldScale();
+  app.stage.addChild(world);
+  isGameLoaded = true;
+}
+
+function updateWorldScale() {
   // calculating scale factor
   let scale = 1;
 
@@ -422,10 +430,6 @@ function setupWorld() {
   world.y = app.screen.height / 2;
 
   world.scale.set(scale, scale);
-
-  app.stage.addChild(world);
-
-  isGameLoaded = true;
 }
 
 function createDeleteIntro(isDelete: boolean) {
@@ -779,14 +783,15 @@ function createDeleteRocketFinishGroup(isDelete: boolean) {
     finishRocketsGroupArray.push(rocket10);
 
   const maxSpeed = 0.8;
-  const speedInv = maxSpeed - 0.3
+  const speedInv = maxSpeed - 0.3;
 
   finishRocketsGroupArray.forEach((element, index) => {
     element.anchor.set(0.5, 0);
     element.x = 0;
     element.loop = false;
-    element.animationSpeed =  (1 - playerRanks[index].rank / playerRanks.length) * speedInv + 0.3;
-    element.play()
+    element.animationSpeed =
+      (1 - playerRanks[index].rank / playerRanks.length) * speedInv + 0.3;
+    element.play();
     finishRocketRaceContainer!!.addChild(element);
   });
 

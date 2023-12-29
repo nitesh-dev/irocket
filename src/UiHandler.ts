@@ -117,7 +117,7 @@ export function onGameOver(rank: number) {
 window.addEventListener("load", () => {
   createPlayers();
   setupPlayers(playerRanks)
-  setup();
+  // setup();
 });
 
 (document.querySelector("#play") as HTMLButtonElement).addEventListener(

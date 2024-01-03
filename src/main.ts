@@ -446,7 +446,7 @@ function createDeleteIntro(isDelete: boolean) {
   intro = new PIXI.AnimatedSprite(introTextures);
   intro.anchor.set(0.5, 0.5);
   intro.x = 0;
-  intro.y = 0;
+  intro.y = 50;
   intro.loop = false;
   intro.animationSpeed = 0.3;
   intro.onComplete = onIntroAnimationComplete;
@@ -504,9 +504,9 @@ function createDeleteRaceLoopGroup(isDelete: boolean) {
   const halfW = raceLoopContainer.width / 2;
   const halfH = raceLoopContainer.height / 2;
 
-  const rocketY = halfH - 100;
+  const rocketY = halfH - 80;
   const rocket1 = new Sprite(raceLoopRocketTextures[0]);
-  rocket1.x = -halfW + 200;
+  rocket1.x = -595;
 
   const rocket2 = new Sprite(raceLoopRocketTextures[1]);
   rocket2.x = -500;
@@ -533,7 +533,7 @@ function createDeleteRaceLoopGroup(isDelete: boolean) {
   rocket9.x = 500;
 
   const rocket10 = new Sprite(raceLoopRocketTextures[9]);
-  rocket10.x = -halfW + 1320;
+  rocket10.x = 595;
 
   raceLoopRocketsArr = new Array<RocketInfo>();
 

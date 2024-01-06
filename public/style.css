@@ -46,6 +46,7 @@ body {
   display: flex;
   align-items: center;
   gap: 12px;
+  flex-wrap: wrap;
 }
 
 .controller button {
@@ -242,6 +243,44 @@ body {
     min-width: 30px;
 
   }
-  
-  
+
+  .controller {
+    left: 24px;
+    bottom: 24px;
+    gap: 8px;
+  }
+
+  .controller button {
+    padding: 0.5em 1em;
+  }
+
+
+}
+
+
+@media only screen and (max-width: 500px) {
+  .canvas-container .left-ui {
+    width: 120px;
+    height: 40px;
+    font-size: 20px;
+    margin: 16px;
+  }
+
+
+  .canvas-container .right-ui {
+    min-width: 120px;
+    min-height: 250px;
+    margin: 16px;
+    gap: 8px;
+    font-size: 12px;
+    padding: 12px;
+    padding-left: 6px;
+  }
+
+  .canvas-container .right-ui p>span:first-child {
+    font-size: 18px;
+    min-width: 30px;
+
+  }
+
 }

@@ -419,12 +419,12 @@ function setupWorld() {
 function updateWorldScale() {
   // calculating scale factor
   let scale = 1;
-
-  if (app.screen.width > app.screen.height) {
-    scale = app.screen.width / 1536;
-  } else {
-    scale = app.screen.height / 1536;
-  }
+  scale = app.screen.width / 1536;
+  
+  // if (app.screen.width > app.screen.height) {
+  // } else {
+  //   scale = app.screen.height / 1536;
+  // }
 
   world.x = app.screen.width / 2;
   world.y = app.screen.height / 2;

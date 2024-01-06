@@ -5,6 +5,9 @@ settings:
   excludeLinksFromLockfile: false
 
 dependencies:
+  '@pixi/sound':
+    specifier: ^5.2.2
+    version: 5.2.2(@pixi/assets@7.3.2)(@pixi/core@7.3.2)
   pixi.js:
     specifier: ^7.3.2
     version: 7.3.2(@pixi/utils@7.3.2)
@@ -468,6 +471,16 @@ packages:
       '@pixi/constants': 7.3.2
       '@types/css-font-loading-module': 0.0.7
       ismobilejs: 1.1.1
+    dev: false
+
+  /@pixi/sound@5.2.2(@pixi/assets@7.3.2)(@pixi/core@7.3.2):
+    resolution: {integrity: sha512-WjUDD24nQaAA2+aHbvDbgB/9l/kni3aNlZSmunU99KBGrQ9NfGS/VvAUxA88b7eOLXNvskzW2cvEnGMbltRiFA==}
+    peerDependencies:
+      '@pixi/assets': ^7.0.0
+      '@pixi/core': ^7.0.0
+    dependencies:
+      '@pixi/assets': 7.3.2(@pixi/core@7.3.2)(@pixi/utils@7.3.2)
+      '@pixi/core': 7.3.2
     dev: false
 
   /@pixi/sprite-animated@7.3.2(@pixi/core@7.3.2)(@pixi/sprite@7.3.2):

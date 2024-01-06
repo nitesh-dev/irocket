@@ -5,6 +5,7 @@ let timer: any = undefined
 
 import { setup, onPlay, onFinish, onReset, updateGamePlayerRanks, setupPlayers } from "./main";
 import { calculateElapsedTime, usernames } from "./utils";
+import { loadAudio } from "./audioManager"; 
 
 const progressEle = document.querySelector(
   "#game-progress-load"
@@ -115,6 +116,7 @@ export function onGameOver(rank: number) {
 }
 
 window.addEventListener("load", () => {
+  loadAudio()
   createPlayers();
   setupPlayers(playerRanks)
   setup();

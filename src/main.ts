@@ -23,6 +23,11 @@ import {
   getTotalFileLength,
 } from "./assetsTextures";
 
+import { playCountDownSound, playIntroSound, playFinishSound, playCrossFinishSound, playBackgroundSound,  } from "./audioManager";
+
+
+
+
 class Sprite extends PIXI.AnimatedSprite {
   to = -1;
   isPlay = false;
@@ -310,6 +315,8 @@ export function onReset() {
     return;
   }
 
+  playBackgroundSound(false)
+
   gameState = "ideal";
   resetCount += 1;
   resetTimer();
@@ -331,6 +338,8 @@ export function onPlay() {
   onReset();
   if (intro) intro.play();
   gameState = "intro";
+  playIntroSound()
+  
 }
 
 let rocketFinishIndex = 0;
@@ -449,6 +458,17 @@ function createDeleteIntro(isDelete: boolean) {
   intro.y = 50;
   intro.loop = false;
   intro.animationSpeed = 0.3;
+  intro.onFrameChange = (currentFrame: number) => {
+    if(currentFrame == 40){
+      playCountDownSound(3)
+    }else if(currentFrame == 55){
+      playCountDownSound(2)
+    }else if(currentFrame == 69){
+      playCountDownSound(1)
+    }else if(currentFrame == 81){
+      playCountDownSound(4)
+    }
+  }
   intro.onComplete = onIntroAnimationComplete;
   world.addChild(intro);
 }
@@ -492,6 +512,7 @@ function createDeleteRaceLoopGroup(isDelete: boolean) {
   raceLoop.loop = true;
   raceLoop.play();
   raceLoopContainer.addChild(raceLoop);
+  playBackgroundSound(true)
 
   finishLine = new PIXI.AnimatedSprite(finishLineTextures);
   finishLine.anchor.set(0.5, 0.5);
@@ -785,6 +806,9 @@ function createDeleteRocketFinishGroup(isDelete: boolean) {
   const maxSpeed = 0.8;
   const speedInv = maxSpeed - 0.3;
 
+  playCrossFinishSound()
+  playBackgroundSound(false)
+
   finishRocketsGroupArray.forEach((element, index) => {
     element.anchor.set(0.5, 0);
     element.x = 0;
@@ -819,6 +843,7 @@ function createDeleteFinalRocket(index: number, isDelete: boolean) {
   finalContainer.addChild(finalRocketBack);
 
   const rocket = new PIXI.AnimatedSprite(finalRocketTextures[index]);
+  playFinishSound()
 
   rocket.visible = true;
   rocket.anchor.set(0.5, 0.5);
@@ -829,7 +854,6 @@ function createDeleteFinalRocket(index: number, isDelete: boolean) {
   rocket.play();
 
   finalContainer.addChild(rocket);
-
   world.addChild(finalContainer);
 
   onGameOver(index + 1);

@@ -539,7 +539,7 @@ function createDeleteRaceLoopGroup(isDelete: boolean) {
   rocket4.x = -220;
 
   const rocket5 = new Sprite(raceLoopRocketTextures[4]);
-  rocket5.x = -80;
+  rocket5.x = -60;
 
   const rocket6 = new Sprite(raceLoopRocketTextures[5]);
   rocket6.x = 80;

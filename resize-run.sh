@@ -1,5 +1,18 @@
 #!/bin/bash
 
+
+# convert png | jpg to webp
+# find . -type f -name "*.png" -exec sh -c '
+#     for file do
+#         cwebp "$file" -o "${file%.png}.webp"
+#     done
+# ' sh {} +
+
+# remove all png and jpg recursive
+# find /path/to/your/folder -type f \( -name "*.png" -o -name "*.jpg" \) -exec rm -f {} +
+
+
+
 # Specify the folder path
 folder_paths=(
     "/home/nitesh/Downloads/iRocket-Racing-Graphics-2023-12-04/finish/finish-background"
@@ -45,6 +58,7 @@ folder_paths=(
 )
 
 
+
 # Iterate over the array of folder paths
 for folder_path in "${folder_paths[@]}"; do
     # Check if the folder exists
@@ -52,18 +66,11 @@ for folder_path in "${folder_paths[@]}"; do
         # Change to the specified folder
         cd "$folder_path" || exit 1
 
-        # Get a list of all files in the folder
-        files=(*)
+        # Resize PNG and JPG images to 50%
+        mogrify -resize 50% *
 
-        # Iterate through the files and delete alternate ones
-        for ((i=1; i<${#files[@]}; i+=2)); do
-            file_to_delete="${files[$i]}"
-            echo "Deleting: $file_to_delete"
-            rm -f "$file_to_delete"
-        done
-
-        echo "Alternate files deleted successfully."
+        echo "Images resized successfully in: $folder_path"
     else
-        echo "Error: Folder does not exist."
+        echo "Error: Folder does not exist: $folder_path"
     fi
 done

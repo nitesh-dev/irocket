@@ -23,10 +23,13 @@ import {
   getTotalFileLength,
 } from "./assetsTextures";
 
-import { playCountDownSound, playIntroSound, playFinishSound, playCrossFinishSound, playBackgroundSound,  } from "./audioManager";
-
-
-
+import {
+  playCountDownSound,
+  playIntroSound,
+  playFinishSound,
+  playCrossFinishSound,
+  playBackgroundSound,
+} from "./audioManager";
 
 class Sprite extends PIXI.AnimatedSprite {
   to = -1;
@@ -87,7 +90,7 @@ function resize() {
     canvasContainer.clientHeight
   );
 
-  updateWorldScale()
+  updateWorldScale();
 }
 
 //  -------------------------------------------- Media query in js ------------------------------------
@@ -137,11 +140,11 @@ const gameAnimSpeed = 0.4;
 
 // ---------------------------------------------- objects ------------------------------------------------------------
 
-let introTextures: any;
+// let introTextures: any;
 
-let finishLineTextures: any;
-let raceLoopTextures: any;
-let raceLoopRocketTextures = new Array();
+// let finishLineTextures: any;
+// let raceLoopTextures: any;
+// let raceLoopRocketTextures = new Array();
 let finishBackTextures: any;
 let finishRocketTextures = new Array();
 
@@ -165,7 +168,20 @@ async function loadMyTextures(urls: Array<string>) {
   });
 
   const load = await Promise.all(tempTextures);
+  // console.log(load);
   return load;
+}
+
+// Function to destroy textures with a random delay
+async function destroyTextures(urls: Array<string>) {
+
+  const tempTextures = urls.map((item, index) => {
+    const temp = PIXI.Assets.unload(item);
+    return temp;
+  });
+
+  await Promise.all(tempTextures);
+  console.log("destroy textures")
 }
 
 async function loadAssets(times: number) {
@@ -174,45 +190,31 @@ async function loadAssets(times: number) {
   try {
     // 1
     progressOffset = 0;
-    introTextures = await loadMyTextures(getIntroTexturesUrl());
+    await loadMyTextures(getIntroTexturesUrl());
 
     // 2
-    finishLineTextures = await loadMyTextures(
-      getRaceLoopFinishLineTexturesUrl()
-    );
-    raceLoopTextures = await loadMyTextures(getRaceLoopTexturesUrl());
+    await loadMyTextures(getRaceLoopFinishLineTexturesUrl());
+    await loadMyTextures(getRaceLoopTexturesUrl());
 
-    raceLoopRocketTextures = [];
-    raceLoopRocketTextures.push(
-      await loadMyTextures(getRaceLoopRocketTexturesUrl("a"))
-    );
-    raceLoopRocketTextures.push(
-      await loadMyTextures(getRaceLoopRocketTexturesUrl("b"))
-    );
-    raceLoopRocketTextures.push(
-      await loadMyTextures(getRaceLoopRocketTexturesUrl("c"))
-    );
-    raceLoopRocketTextures.push(
-      await loadMyTextures(getRaceLoopRocketTexturesUrl("d"))
-    );
-    raceLoopRocketTextures.push(
-      await loadMyTextures(getRaceLoopRocketTexturesUrl("e"))
-    );
-    raceLoopRocketTextures.push(
-      await loadMyTextures(getRaceLoopRocketTexturesUrl("f"))
-    );
-    raceLoopRocketTextures.push(
-      await loadMyTextures(getRaceLoopRocketTexturesUrl("g"))
-    );
-    raceLoopRocketTextures.push(
-      await loadMyTextures(getRaceLoopRocketTexturesUrl("h"))
-    );
-    raceLoopRocketTextures.push(
-      await loadMyTextures(getRaceLoopRocketTexturesUrl("i"))
-    );
-    raceLoopRocketTextures.push(
-      await loadMyTextures(getRaceLoopRocketTexturesUrl("j"))
-    );
+    await loadMyTextures(getRaceLoopRocketTexturesUrl("a"));
+
+    await loadMyTextures(getRaceLoopRocketTexturesUrl("b"));
+
+    await loadMyTextures(getRaceLoopRocketTexturesUrl("c"));
+
+    await loadMyTextures(getRaceLoopRocketTexturesUrl("d"));
+
+    await loadMyTextures(getRaceLoopRocketTexturesUrl("e"));
+
+    await loadMyTextures(getRaceLoopRocketTexturesUrl("f"));
+
+    await loadMyTextures(getRaceLoopRocketTexturesUrl("g"));
+
+    await loadMyTextures(getRaceLoopRocketTexturesUrl("h"));
+
+    await loadMyTextures(getRaceLoopRocketTexturesUrl("i"));
+
+    await loadMyTextures(getRaceLoopRocketTexturesUrl("j"));
 
     // 3
     finishBackTextures = await loadMyTextures(getFinishBackTexturesUrl());
@@ -309,13 +311,13 @@ async function onStart() {
   onReset();
 }
 
-export function onReset() {
+export async function onReset() {
   if (!isGameLoaded) {
     print("Game is not loaded yet!");
     return;
   }
 
-  playBackgroundSound(false)
+  playBackgroundSound(false);
 
   gameState = "ideal";
   resetCount += 1;
@@ -326,20 +328,19 @@ export function onReset() {
   createDeleteIntro(true);
   createDeleteRaceLoopGroup(true);
   createDeleteFinalRocket(rocketFinishIndex, true);
-  createDeleteIntro(false);
+  await createDeleteIntro(false);
 }
 
-export function onPlay() {
+export async function onPlay() {
   if (!isGameLoaded) {
     print("Game is not loaded yet!");
     return;
   }
 
-  onReset();
+  await onReset();
   if (intro) intro.play();
   gameState = "intro";
-  playIntroSound()
-  
+  playIntroSound();
 }
 
 let rocketFinishIndex = 0;
@@ -389,6 +390,8 @@ function onIntroAnimationComplete() {
     return;
   }
 
+  destroyTextures(getIntroTexturesUrl());
+
   gameState = "race";
   startTimer();
   createDeleteIntro(true);
@@ -429,7 +432,7 @@ function updateWorldScale() {
   // calculating scale factor
   let scale = 1;
   scale = app.screen.width / 1536;
-  
+
   // if (app.screen.width > app.screen.height) {
   // } else {
   //   scale = app.screen.height / 1536;
@@ -441,34 +444,39 @@ function updateWorldScale() {
   world.scale.set(scale, scale);
 }
 
-function createDeleteIntro(isDelete: boolean) {
+let introTextures: any[] = [];
+async function createDeleteIntro(isDelete: boolean) {
   if (isDelete) {
     if (intro) {
       intro.onComplete = () => {
         print("skipped intro listener");
       };
+
       world.removeChild(intro);
     }
     return;
   }
 
+  introTextures = await loadMyTextures(getIntroTexturesUrl());
+  console.log("introTextures loaded");
   intro = new PIXI.AnimatedSprite(introTextures);
   intro.anchor.set(0.5, 0.5);
   intro.x = 0;
   intro.y = 50;
   intro.loop = false;
   intro.animationSpeed = 0.3;
+  // intro.play()
   intro.onFrameChange = (currentFrame: number) => {
-    if(currentFrame == 40){
-      playCountDownSound(3)
-    }else if(currentFrame == 55){
-      playCountDownSound(2)
-    }else if(currentFrame == 69){
-      playCountDownSound(1)
-    }else if(currentFrame == 81){
-      playCountDownSound(4)
+    if (currentFrame == 40) {
+      playCountDownSound(3);
+    } else if (currentFrame == 55) {
+      playCountDownSound(2);
+    } else if (currentFrame == 69) {
+      playCountDownSound(1);
+    } else if (currentFrame == 81) {
+      playCountDownSound(4);
     }
-  }
+  };
   intro.onComplete = onIntroAnimationComplete;
   world.addChild(intro);
 }
@@ -489,7 +497,7 @@ let isRocketRankChangeAllowed = false;
 
 // max index 29
 
-function createDeleteRaceLoopGroup(isDelete: boolean) {
+async function createDeleteRaceLoopGroup(isDelete: boolean) {
   isRocketRankChangeAllowed = false;
   if (isDelete) {
     if (raceLoopContainer) {
@@ -505,6 +513,7 @@ function createDeleteRaceLoopGroup(isDelete: boolean) {
   }
 
   raceLoopContainer = new PIXI.Container();
+  const raceLoopTextures = await loadMyTextures(getRaceLoopTexturesUrl());
 
   const raceLoop = new PIXI.AnimatedSprite(raceLoopTextures);
   raceLoop.anchor.set(0.5, 0.5);
@@ -512,8 +521,11 @@ function createDeleteRaceLoopGroup(isDelete: boolean) {
   raceLoop.loop = true;
   raceLoop.play();
   raceLoopContainer.addChild(raceLoop);
-  playBackgroundSound(true)
+  playBackgroundSound(true);
 
+  const finishLineTextures = await loadMyTextures(
+    getRaceLoopFinishLineTexturesUrl()
+  );
   finishLine = new PIXI.AnimatedSprite(finishLineTextures);
   finishLine.anchor.set(0.5, 0.5);
   finishLine.animationSpeed = gameAnimSpeed;
@@ -524,6 +536,39 @@ function createDeleteRaceLoopGroup(isDelete: boolean) {
 
   const halfW = raceLoopContainer.width / 2;
   const halfH = raceLoopContainer.height / 2;
+
+  const raceLoopRocketTextures = [];
+
+  raceLoopRocketTextures.push(
+    await loadMyTextures(getRaceLoopRocketTexturesUrl("a"))
+  );
+  raceLoopRocketTextures.push(
+    await loadMyTextures(getRaceLoopRocketTexturesUrl("b"))
+  );
+  raceLoopRocketTextures.push(
+    await loadMyTextures(getRaceLoopRocketTexturesUrl("c"))
+  );
+  raceLoopRocketTextures.push(
+    await loadMyTextures(getRaceLoopRocketTexturesUrl("d"))
+  );
+  raceLoopRocketTextures.push(
+    await loadMyTextures(getRaceLoopRocketTexturesUrl("e"))
+  );
+  raceLoopRocketTextures.push(
+    await loadMyTextures(getRaceLoopRocketTexturesUrl("f"))
+  );
+  raceLoopRocketTextures.push(
+    await loadMyTextures(getRaceLoopRocketTexturesUrl("g"))
+  );
+  raceLoopRocketTextures.push(
+    await loadMyTextures(getRaceLoopRocketTexturesUrl("h"))
+  );
+  raceLoopRocketTextures.push(
+    await loadMyTextures(getRaceLoopRocketTexturesUrl("i"))
+  );
+  raceLoopRocketTextures.push(
+    await loadMyTextures(getRaceLoopRocketTexturesUrl("j"))
+  );
 
   const rocketY = halfH - 80;
   const rocket1 = new Sprite(raceLoopRocketTextures[0]);
@@ -686,7 +731,7 @@ function createDeleteRaceLoopGroup(isDelete: boolean) {
   });
 }
 
-export function updateGamePlayerRanks(ranks: Array<PlayerRank>) {
+export async function updateGamePlayerRanks(ranks: Array<PlayerRank>) {
   // console.log("game");
   if (!isRocketRankChangeAllowed) {
     print("Rank change not allowed");
@@ -696,6 +741,39 @@ export function updateGamePlayerRanks(ranks: Array<PlayerRank>) {
   createPlayers();
 
   const frameInv = Math.floor(30 / ranks.length);
+
+  const raceLoopRocketTextures = [];
+
+  raceLoopRocketTextures.push(
+    await loadMyTextures(getRaceLoopRocketTexturesUrl("a"))
+  );
+  raceLoopRocketTextures.push(
+    await loadMyTextures(getRaceLoopRocketTexturesUrl("b"))
+  );
+  raceLoopRocketTextures.push(
+    await loadMyTextures(getRaceLoopRocketTexturesUrl("c"))
+  );
+  raceLoopRocketTextures.push(
+    await loadMyTextures(getRaceLoopRocketTexturesUrl("d"))
+  );
+  raceLoopRocketTextures.push(
+    await loadMyTextures(getRaceLoopRocketTexturesUrl("e"))
+  );
+  raceLoopRocketTextures.push(
+    await loadMyTextures(getRaceLoopRocketTexturesUrl("f"))
+  );
+  raceLoopRocketTextures.push(
+    await loadMyTextures(getRaceLoopRocketTexturesUrl("g"))
+  );
+  raceLoopRocketTextures.push(
+    await loadMyTextures(getRaceLoopRocketTexturesUrl("h"))
+  );
+  raceLoopRocketTextures.push(
+    await loadMyTextures(getRaceLoopRocketTexturesUrl("i"))
+  );
+  raceLoopRocketTextures.push(
+    await loadMyTextures(getRaceLoopRocketTexturesUrl("j"))
+  );
 
   for (const element of raceLoopRocketsArr) {
     const index = ranks.findIndex((item) => item.name == element.player.name);
@@ -806,8 +884,8 @@ function createDeleteRocketFinishGroup(isDelete: boolean) {
   const maxSpeed = 0.8;
   const speedInv = maxSpeed - 0.3;
 
-  playCrossFinishSound()
-  playBackgroundSound(false)
+  playCrossFinishSound();
+  playBackgroundSound(false);
 
   finishRocketsGroupArray.forEach((element, index) => {
     element.anchor.set(0.5, 0);
@@ -843,7 +921,7 @@ function createDeleteFinalRocket(index: number, isDelete: boolean) {
   finalContainer.addChild(finalRocketBack);
 
   const rocket = new PIXI.AnimatedSprite(finalRocketTextures[index]);
-  playFinishSound()
+  playFinishSound();
 
   rocket.visible = true;
   rocket.anchor.set(0.5, 0.5);

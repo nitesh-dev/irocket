@@ -173,16 +173,16 @@ async function loadMyTextures(urls: Array<string>) {
   return load;
 }
 
-// Function to destroy textures with a random delay
-async function destroyTextures(urls: Array<string>) {
-  const tempTextures = urls.map((item, index) => {
-    const temp = PIXI.Assets.unload(item);
-    return temp;
-  });
+// // Function to destroy textures with a random delay
+// async function destroyTextures(urls: Array<string>) {
+//   const tempTextures = urls.map((item, index) => {
+//     const temp = PIXI.Assets.unload(item);
+//     return temp;
+//   });
 
-  await Promise.all(tempTextures);
-  console.log("destroy textures");
-}
+//   await Promise.all(tempTextures);
+//   console.log("destroy textures");
+// }
 
 async function loadAssets(times: number) {
   //1
@@ -390,7 +390,7 @@ function onIntroAnimationComplete() {
     return;
   }
 
-  destroyTextures(getIntroTexturesUrl());
+  // destroyTextures(getIntroTexturesUrl());
 
   gameState = "race";
   startTimer();
@@ -434,7 +434,7 @@ function updateWorldScale() {
 
   // 1536
   if (isLowResolution()) {
-    scale = app.screen.width / 960;
+    scale = app.screen.width / 768;
   } else {
     scale = app.screen.width / 1536;
   }

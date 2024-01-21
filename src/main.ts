@@ -30,6 +30,7 @@ import {
   playCrossFinishSound,
   playBackgroundSound,
 } from "./audioManager";
+import { isLowResolution } from "./utils";
 
 class Sprite extends PIXI.AnimatedSprite {
   to = -1;
@@ -174,14 +175,13 @@ async function loadMyTextures(urls: Array<string>) {
 
 // Function to destroy textures with a random delay
 async function destroyTextures(urls: Array<string>) {
-
   const tempTextures = urls.map((item, index) => {
     const temp = PIXI.Assets.unload(item);
     return temp;
   });
 
   await Promise.all(tempTextures);
-  console.log("destroy textures")
+  console.log("destroy textures");
 }
 
 async function loadAssets(times: number) {
@@ -431,7 +431,13 @@ function setupWorld() {
 function updateWorldScale() {
   // calculating scale factor
   let scale = 1;
-  scale = app.screen.width / 1536;
+
+  // 1536
+  if (isLowResolution()) {
+    scale = app.screen.width / 960;
+  } else {
+    scale = app.screen.width / 1536;
+  }
 
   // if (app.screen.width > app.screen.height) {
   // } else {
@@ -570,36 +576,44 @@ async function createDeleteRaceLoopGroup(isDelete: boolean) {
     await loadMyTextures(getRaceLoopRocketTexturesUrl("j"))
   );
 
+  let pos = Array<number>();
+
+  if (isLowResolution()) {
+    pos = [-380, 0, 0, 0, 0, 80, 220, 360, 500, 595];
+  } else {
+    pos = [-595, -500, -360, -220, -60, 80, 220, 360, 500, 595];
+  }
+
   const rocketY = halfH - 80;
   const rocket1 = new Sprite(raceLoopRocketTextures[0]);
-  rocket1.x = -595;
+  rocket1.x = pos[0];
 
   const rocket2 = new Sprite(raceLoopRocketTextures[1]);
-  rocket2.x = -500;
+  rocket2.x = pos[1];
 
   const rocket3 = new Sprite(raceLoopRocketTextures[2]);
-  rocket3.x = -360;
+  rocket3.x = pos[2];
 
   const rocket4 = new Sprite(raceLoopRocketTextures[3]);
-  rocket4.x = -220;
+  rocket4.x = pos[3];
 
   const rocket5 = new Sprite(raceLoopRocketTextures[4]);
-  rocket5.x = -60;
+  rocket5.x = pos[4];
 
   const rocket6 = new Sprite(raceLoopRocketTextures[5]);
-  rocket6.x = 80;
+  rocket6.x = pos[5];
 
   const rocket7 = new Sprite(raceLoopRocketTextures[6]);
-  rocket7.x = 220;
+  rocket7.x = pos[6];
 
   const rocket8 = new Sprite(raceLoopRocketTextures[7]);
-  rocket8.x = 360;
+  rocket8.x = pos[7];
 
   const rocket9 = new Sprite(raceLoopRocketTextures[8]);
-  rocket9.x = 500;
+  rocket9.x = pos[8];
 
   const rocket10 = new Sprite(raceLoopRocketTextures[9]);
-  rocket10.x = 595;
+  rocket10.x = pos[9];
 
   raceLoopRocketsArr = new Array<RocketInfo>();
 

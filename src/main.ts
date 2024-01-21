@@ -578,13 +578,15 @@ async function createDeleteRaceLoopGroup(isDelete: boolean) {
 
   let pos = Array<number>();
 
-  if (isLowResolution()) {
-    pos = [-380, 0, 0, 0, 0, 80, 220, 360, 500, 595];
+  const isLow = isLowResolution();
+  if (isLow) {
+    pos = [-370, -320, -230, -140, -45, 45, 140, 230, 320, 370];
   } else {
     pos = [-595, -500, -360, -220, -60, 80, 220, 360, 500, 595];
   }
 
-  const rocketY = halfH - 80;
+  let rocketY = halfH - 80;
+  if (isLow) rocketY = halfH - 40;
   const rocket1 = new Sprite(raceLoopRocketTextures[0]);
   rocket1.x = pos[0];
 
@@ -851,26 +853,35 @@ function createDeleteRocketFinishGroup(isDelete: boolean) {
 
   finishRocketRaceContainer.addChild(finishBack);
 
+  let pos = Array<number>();
+
+  const isLow = isLowResolution();
+  if (isLow) {
+    pos = [-20, 0, 20, 40, 60, 80, 100, 125, 150, 180];
+  } else {
+    pos = [-30, 0, 45, 65, 100, 130, 160, 205, 245, 285];
+  }
+
   const rocket1 = new PIXI.AnimatedSprite(finishRocketTextures[0]);
-  rocket1.y = -30;
+  rocket1.y = pos[0];
   const rocket2 = new PIXI.AnimatedSprite(finishRocketTextures[1]);
-  rocket2.y = 0;
+  rocket2.y = pos[1];
   const rocket3 = new PIXI.AnimatedSprite(finishRocketTextures[2]);
-  rocket3.y = 45;
+  rocket3.y = pos[2];
   const rocket4 = new PIXI.AnimatedSprite(finishRocketTextures[3]);
-  rocket4.y = 65;
+  rocket4.y = pos[3];
   const rocket5 = new PIXI.AnimatedSprite(finishRocketTextures[4]);
-  rocket5.y = 100;
+  rocket5.y = pos[4];
   const rocket6 = new PIXI.AnimatedSprite(finishRocketTextures[5]);
-  rocket6.y = 130;
+  rocket6.y = pos[5];
   const rocket7 = new PIXI.AnimatedSprite(finishRocketTextures[6]);
-  rocket7.y = 160;
+  rocket7.y = pos[6];
   const rocket8 = new PIXI.AnimatedSprite(finishRocketTextures[7]);
-  rocket8.y = 205;
+  rocket8.y = pos[7];
   const rocket9 = new PIXI.AnimatedSprite(finishRocketTextures[8]);
-  rocket9.y = 245;
+  rocket9.y = pos[8];
   const rocket10 = new PIXI.AnimatedSprite(finishRocketTextures[9]);
-  rocket10.y = 285;
+  rocket10.y = pos[9];
 
   const finishRocketsGroupArray = Array<PIXI.AnimatedSprite>();
 

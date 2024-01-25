@@ -31,6 +31,7 @@ import {
   playBackgroundSound,
 } from "./audioManager";
 import { isLowResolution } from "./utils";
+import GameObject from "./gameObject";
 
 class Sprite extends PIXI.AnimatedSprite {
   to = -1;
@@ -146,10 +147,8 @@ const gameAnimSpeed = 0.4;
 // let finishLineTextures: any;
 // let raceLoopTextures: any;
 // let raceLoopRocketTextures = new Array();
-let finishBackTextures: any;
 let finishRocketTextures = new Array();
 
-let finalBackTextures: any;
 let finalRocketTextures = new Array();
 
 const totalProgress = getTotalFileLength();
@@ -161,7 +160,7 @@ function calculateLoadingProgress() {
   onLoadProgress(percent);
 }
 
-async function loadMyTextures(urls: Array<string>) {
+export async function loadMyTextures(urls: Array<string>) {
   const tempTextures = urls.map((item, index) => {
     const temp = PIXI.Assets.load(item);
     calculateLoadingProgress();
@@ -190,11 +189,11 @@ async function loadAssets(times: number) {
   try {
     // 1
     progressOffset = 0;
-    await loadMyTextures(getIntroTexturesUrl());
+    await loadMyTextures([getIntroTexturesUrl()]);
 
     // 2
     await loadMyTextures(getRaceLoopFinishLineTexturesUrl());
-    await loadMyTextures(getRaceLoopTexturesUrl());
+    await loadMyTextures([getRaceLoopTexturesUrl()]);
 
     await loadMyTextures(getRaceLoopRocketTexturesUrl("a"));
 
@@ -217,7 +216,7 @@ async function loadAssets(times: number) {
     await loadMyTextures(getRaceLoopRocketTexturesUrl("j"));
 
     // 3
-    finishBackTextures = await loadMyTextures(getFinishBackTexturesUrl());
+    await loadMyTextures([getFinishBackTexturesUrl()]);
 
     finishRocketTextures = [];
     finishRocketTextures.push(
@@ -253,7 +252,7 @@ async function loadAssets(times: number) {
 
     // 4
 
-    finalBackTextures = await loadMyTextures(getFinalBackTexturesUrl());
+    await loadMyTextures([getFinalBackTexturesUrl()]);
     finalRocketTextures = [];
 
     finalRocketTextures.push(
@@ -290,8 +289,8 @@ async function loadAssets(times: number) {
     return true;
   } catch (error) {
     print(error as string);
-    if (times == 1) return false;
-    return loadAssets(1);
+    // if (times == 1) return false;
+    // return loadAssets(1);
   }
 }
 
@@ -351,9 +350,11 @@ export function onFinish(index: number) {
     return;
   }
 
+  console.log(gameState, "onfinish");
+
   if (gameState != "race") {
     print(
-      "Unable to finish game while in intro, please wait for the intro to finish"
+      "Unable to finish game in another state, wait for the state to complete"
     );
     return;
   }
@@ -413,7 +414,7 @@ function onFinishRaceBackAnimationComplete() {
 
 // ---------------------------------------------  game logic ------------------------------------------------
 let world = new PIXI.Container();
-let intro: PIXI.AnimatedSprite;
+let intro: GameObject;
 let raceLoopContainer = new PIXI.Container();
 let finalContainer = new PIXI.Container();
 
@@ -450,41 +451,40 @@ function updateWorldScale() {
   world.scale.set(scale, scale);
 }
 
-let introTextures: any[] = [];
 async function createDeleteIntro(isDelete: boolean) {
   if (isDelete) {
-    if (intro) {
-      intro.onComplete = () => {
-        print("skipped intro listener");
-      };
+    if (intro && intro.gameObject) {
+      intro.removeEndListener(onIntroAnimationComplete);
 
-      world.removeChild(intro);
+      world.removeChild(intro.gameObject);
     }
     return;
   }
 
-  introTextures = await loadMyTextures(getIntroTexturesUrl());
+  intro = new GameObject(false);
+  await intro.create(getIntroTexturesUrl());
   console.log("introTextures loaded");
-  intro = new PIXI.AnimatedSprite(introTextures);
-  intro.anchor.set(0.5, 0.5);
-  intro.x = 0;
-  intro.y = 50;
-  intro.loop = false;
-  intro.animationSpeed = 0.3;
+
+  intro.gameObject!!.anchor.set(0.5, 0.5);
+  intro.gameObject!!.x = 0;
+  intro.gameObject!!.y = 50;
+
+  // intro.loop = false;
+  // intro.animationSpeed = 0.3;
   // intro.play()
-  intro.onFrameChange = (currentFrame: number) => {
-    if (currentFrame == 40) {
-      playCountDownSound(3);
-    } else if (currentFrame == 55) {
-      playCountDownSound(2);
-    } else if (currentFrame == 69) {
-      playCountDownSound(1);
-    } else if (currentFrame == 81) {
-      playCountDownSound(4);
-    }
-  };
-  intro.onComplete = onIntroAnimationComplete;
-  world.addChild(intro);
+  // intro.onFrameChange = (currentFrame: number) => {
+  //   if (currentFrame == 40) {
+  //     playCountDownSound(3);
+  //   } else if (currentFrame == 55) {
+  //     playCountDownSound(2);
+  //   } else if (currentFrame == 69) {
+  //     playCountDownSound(1);
+  //   } else if (currentFrame == 81) {
+  //     playCountDownSound(4);
+  //   }
+  // };
+  intro.addEndListener(onIntroAnimationComplete);
+  world.addChild(intro.gameObject!!);
 }
 
 let playerRanks = Array<PlayerRank>();
@@ -519,14 +519,16 @@ async function createDeleteRaceLoopGroup(isDelete: boolean) {
   }
 
   raceLoopContainer = new PIXI.Container();
-  const raceLoopTextures = await loadMyTextures(getRaceLoopTexturesUrl());
 
-  const raceLoop = new PIXI.AnimatedSprite(raceLoopTextures);
-  raceLoop.anchor.set(0.5, 0.5);
-  raceLoop.animationSpeed = gameAnimSpeed;
-  raceLoop.loop = true;
-  raceLoop.play();
-  raceLoopContainer.addChild(raceLoop);
+  const raceLoop = new GameObject(true);
+  await raceLoop.create(getRaceLoopTexturesUrl());
+
+  if (raceLoop.gameObject) {
+    raceLoop.play();
+    raceLoop.gameObject.anchor.set(0.5, 0.5);
+    raceLoopContainer.addChild(raceLoop.gameObject);
+  }
+
   playBackgroundSound(true);
 
   const finishLineTextures = await loadMyTextures(
@@ -829,7 +831,7 @@ export async function updateGamePlayerRanks(ranks: Array<PlayerRank>) {
   }
 }
 
-function createDeleteRocketFinishGroup(isDelete: boolean) {
+async function createDeleteRocketFinishGroup(isDelete: boolean) {
   if (isDelete) {
     if (finishRocketRaceContainer) {
       finishRocketRaceContainer.removeAllListeners();
@@ -842,16 +844,16 @@ function createDeleteRocketFinishGroup(isDelete: boolean) {
   if (finishRocketRaceContainer) world.removeChild(finishRocketRaceContainer);
 
   finishRocketRaceContainer = new PIXI.Container();
-  const finishBack = new PIXI.AnimatedSprite(finishBackTextures);
-  finishBack.anchor.set(0.5, 0.5);
-  finishBack.x = 0;
-  finishBack.y = 0;
-  finishBack.loop = false;
-  finishBack.animationSpeed = gameAnimSpeed;
-  finishBack.play();
-  finishBack.onComplete = onFinishRaceBackAnimationComplete;
-
-  finishRocketRaceContainer.addChild(finishBack);
+  const finishBack = new GameObject(false);
+  await finishBack.create(getFinishBackTexturesUrl());
+  if (finishBack.gameObject) {
+    finishBack.gameObject.anchor.set(0.5, 0.5);
+    finishBack.gameObject.x = 0;
+    finishBack.gameObject.y = 0;
+    finishBack.addEndListener(onFinishRaceBackAnimationComplete)
+    finishRocketRaceContainer.addChild(finishBack.gameObject);
+    finishBack.play()
+  }
 
   let pos = Array<number>();
 
@@ -925,7 +927,7 @@ function createDeleteRocketFinishGroup(isDelete: boolean) {
   world.addChild(finishRocketRaceContainer);
 }
 
-function createDeleteFinalRocket(index: number, isDelete: boolean) {
+async function createDeleteFinalRocket(index: number, isDelete: boolean) {
   if (isDelete) {
     if (finalContainer) {
       finalContainer.removeAllListeners();
@@ -936,14 +938,15 @@ function createDeleteFinalRocket(index: number, isDelete: boolean) {
 
   finalContainer = new PIXI.Container();
 
-  let finalRocketBack = new PIXI.AnimatedSprite(finalBackTextures);
-  finalRocketBack.anchor.set(0.5, 0.5);
-  finalRocketBack.x = 0;
-  finalRocketBack.y = 0;
-  finalRocketBack.loop = false;
-  finalRocketBack.animationSpeed = gameAnimSpeed;
-  finalRocketBack.play();
-  finalContainer.addChild(finalRocketBack);
+  let finalRocketBack = new GameObject(false);
+  await finalRocketBack.create(getFinalBackTexturesUrl());
+  if(finalRocketBack.gameObject){
+    finalRocketBack.gameObject.anchor.set(0.5, 0.5);
+    finalRocketBack.gameObject.x = 0;
+    finalRocketBack.gameObject.y = 0;
+    finalContainer.addChild(finalRocketBack.gameObject);
+    finalRocketBack.play()
+  }
 
   const rocket = new PIXI.AnimatedSprite(finalRocketTextures[index]);
   playFinishSound();

@@ -8,7 +8,7 @@ export default class GameObject {
   private videoResource: PIXI.VideoResource | null = null;
   constructor(private isLoop: boolean) {}
 
-  async create(url: string) {
+  async create(url: string, play: boolean = false) {
     const texture = await loadMyTextures([url]);
     this.gameObject = new PIXI.Sprite(texture[0]);
     this.videoResource = this.gameObject.texture.baseTexture
@@ -17,6 +17,15 @@ export default class GameObject {
     this.videoElement.muted = true;
     this.videoElement.loop = this.isLoop;
     this.videoElement.autoplay = true;
+    this.videoElement.play();
+    this.videoElement.pause();
+  }
+
+  reset(){
+    if(!this.videoElement) return
+    this.videoElement.currentTime = 0;
+    this.videoElement.play();
+    this.videoElement.pause();
   }
 
   addEndListener(callback: () => void) {
@@ -31,9 +40,23 @@ export default class GameObject {
     }
   }
 
+  onPlaying(callback: (time: number) => void) {
+    if (this.videoElement) {
+      this.videoElement.addEventListener("timeupdate", () => {
+        // if (videoElement.currentTime > videoElement.duration - 3) {
+        //   videoElement.currentTime = 0;
+        // }
+        // console.log(this.videoElement!!.currentTime);
+        callback(this.videoElement!!.currentTime);
+      });
+    }
+  }
+
   play() {
     if (this.videoElement) {
+      this.videoElement.currentTime = 0;
       this.videoElement.play();
+      // this.videoElement.style.opacity = "1";
     }
   }
 }

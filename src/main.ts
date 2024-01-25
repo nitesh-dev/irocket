@@ -172,17 +172,6 @@ export async function loadMyTextures(urls: Array<string>) {
   return load;
 }
 
-// // Function to destroy textures with a random delay
-// async function destroyTextures(urls: Array<string>) {
-//   const tempTextures = urls.map((item, index) => {
-//     const temp = PIXI.Assets.unload(item);
-//     return temp;
-//   });
-
-//   await Promise.all(tempTextures);
-//   console.log("destroy textures");
-// }
-
 async function loadAssets(times: number) {
   //1
 
@@ -289,8 +278,8 @@ async function loadAssets(times: number) {
     return true;
   } catch (error) {
     print(error as string);
-    // if (times == 1) return false;
-    // return loadAssets(1);
+    if (times == 1) return false;
+    return loadAssets(1);
   }
 }
 
@@ -451,11 +440,12 @@ function updateWorldScale() {
   world.scale.set(scale, scale);
 }
 
+
+let oldIntroSound = 0
 async function createDeleteIntro(isDelete: boolean) {
   if (isDelete) {
     if (intro && intro.gameObject) {
       intro.removeEndListener(onIntroAnimationComplete);
-
       world.removeChild(intro.gameObject);
     }
     return;
@@ -464,6 +454,7 @@ async function createDeleteIntro(isDelete: boolean) {
   intro = new GameObject(false);
   await intro.create(getIntroTexturesUrl());
   console.log("introTextures loaded");
+  intro.reset();
 
   intro.gameObject!!.anchor.set(0.5, 0.5);
   intro.gameObject!!.x = 0;
@@ -483,6 +474,20 @@ async function createDeleteIntro(isDelete: boolean) {
   //     playCountDownSound(4);
   //   }
   // };
+  intro.onPlaying((time: number) => {
+    const currentTime = Math.round(time)
+    if(oldIntroSound == currentTime) return
+    oldIntroSound = currentTime
+    if (currentTime == 2) {
+      playCountDownSound(3);
+    } else if (currentTime == 3) {
+      playCountDownSound(2);
+    } else if (currentTime == 4) {
+      playCountDownSound(1);
+    } else if (currentTime == 5) {
+      playCountDownSound(4);
+    }
+  });
   intro.addEndListener(onIntroAnimationComplete);
   world.addChild(intro.gameObject!!);
 }
@@ -582,13 +587,13 @@ async function createDeleteRaceLoopGroup(isDelete: boolean) {
 
   const isLow = isLowResolution();
   if (isLow) {
-    pos = [-370, -320, -230, -140, -45, 45, 140, 230, 320, 370];
+    pos = [-290, -250, -180, -110, -40, 40, 110, 180, 250, 290];
   } else {
     pos = [-595, -500, -360, -220, -60, 80, 220, 360, 500, 595];
   }
 
   let rocketY = halfH - 80;
-  if (isLow) rocketY = halfH - 40;
+  if (isLow) rocketY = halfH - 30;
   const rocket1 = new Sprite(raceLoopRocketTextures[0]);
   rocket1.x = pos[0];
 
@@ -850,16 +855,16 @@ async function createDeleteRocketFinishGroup(isDelete: boolean) {
     finishBack.gameObject.anchor.set(0.5, 0.5);
     finishBack.gameObject.x = 0;
     finishBack.gameObject.y = 0;
-    finishBack.addEndListener(onFinishRaceBackAnimationComplete)
+    finishBack.addEndListener(onFinishRaceBackAnimationComplete);
     finishRocketRaceContainer.addChild(finishBack.gameObject);
-    finishBack.play()
+    finishBack.play();
   }
 
   let pos = Array<number>();
 
   const isLow = isLowResolution();
   if (isLow) {
-    pos = [-20, 0, 20, 40, 60, 80, 100, 125, 150, 180];
+    pos = [-20, 0, 20, 40, 58, 78, 95, 115, 130, 150];
   } else {
     pos = [-30, 0, 45, 65, 100, 130, 160, 205, 245, 285];
   }
@@ -940,12 +945,12 @@ async function createDeleteFinalRocket(index: number, isDelete: boolean) {
 
   let finalRocketBack = new GameObject(false);
   await finalRocketBack.create(getFinalBackTexturesUrl());
-  if(finalRocketBack.gameObject){
+  if (finalRocketBack.gameObject) {
     finalRocketBack.gameObject.anchor.set(0.5, 0.5);
     finalRocketBack.gameObject.x = 0;
     finalRocketBack.gameObject.y = 0;
     finalContainer.addChild(finalRocketBack.gameObject);
-    finalRocketBack.play()
+    finalRocketBack.play();
   }
 
   const rocket = new PIXI.AnimatedSprite(finalRocketTextures[index]);
@@ -956,7 +961,7 @@ async function createDeleteFinalRocket(index: number, isDelete: boolean) {
   rocket.x = 0;
   rocket.y = 0;
   rocket.loop = false;
-  rocket.animationSpeed = gameAnimSpeed;
+  rocket.animationSpeed = 0.3;
   rocket.play();
 
   finalContainer.addChild(rocket);

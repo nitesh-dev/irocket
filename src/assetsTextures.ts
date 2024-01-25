@@ -104,12 +104,8 @@ export function getFinalRocketTexturesUrl(name: string) {
 }
 
 export function getTotalFileLength() {
-  let len = 0;
-  len += getIntroTexturesUrl().length;
-  len += getFinalBackTexturesUrl().length;
-  len += getFinishBackTexturesUrl().length;
+  let len = 4;
   len += getRaceLoopFinishLineTexturesUrl().length;
-  len += getRaceLoopTexturesUrl().length;
 
   len += getRaceLoopRocketTexturesUrl("a").length * 10;
   len += getFinalRocketTexturesUrl("a").length * 10;

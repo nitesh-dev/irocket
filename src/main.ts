@@ -478,13 +478,13 @@ async function createDeleteIntro(isDelete: boolean) {
     const currentTime = Math.round(time)
     if(oldIntroSound == currentTime) return
     oldIntroSound = currentTime
-    if (currentTime == 2) {
+    if (currentTime == 3) {
       playCountDownSound(3);
-    } else if (currentTime == 3) {
-      playCountDownSound(2);
     } else if (currentTime == 4) {
-      playCountDownSound(1);
+      playCountDownSound(2);
     } else if (currentTime == 5) {
+      playCountDownSound(1);
+    } else if (currentTime == 6) {
       playCountDownSound(4);
     }
   });

@@ -452,7 +452,7 @@ async function createDeleteIntro(isDelete: boolean) {
   }
 
   intro = new GameObject(false);
-  await intro.create(getIntroTexturesUrl());
+  await intro.create(getIntroTexturesUrl(), true);
   console.log("introTextures loaded");
   intro.reset();
 

@@ -8,7 +8,7 @@ export default class GameObject {
   private videoResource: PIXI.VideoResource | null = null;
   constructor(private isLoop: boolean) {}
 
-  async create(url: string, play: boolean = false) {
+  async create(url: string, isIntro: boolean = false) {
     const texture = await loadMyTextures([url]);
     this.gameObject = new PIXI.Sprite(texture[0]);
     this.videoResource = this.gameObject.texture.baseTexture
@@ -17,12 +17,18 @@ export default class GameObject {
     this.videoElement.muted = true;
     this.videoElement.loop = this.isLoop;
     this.videoElement.autoplay = true;
-    this.videoElement.play();
-    this.videoElement.pause();
+    if (isIntro) {
+      this.gameObject.visible = false;
+      await this.videoElement.play();
+      this.videoElement.pause();
+      setTimeout(() => {
+        if (this.gameObject) this.gameObject.visible = true;
+      }, 100);
+    }
   }
 
-  reset(){
-    if(!this.videoElement) return
+  reset() {
+    if (!this.videoElement) return;
     this.videoElement.currentTime = 0;
     this.videoElement.play();
     this.videoElement.pause();

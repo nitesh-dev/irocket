@@ -587,7 +587,7 @@ async function createDeleteRaceLoopGroup(isDelete: boolean) {
 
   const isLow = isLowResolution();
   if (isLow) {
-    pos = [-290, -250, -180, -110, -40, 40, 110, 180, 250, 290];
+    pos = [-295, -250, -180, -110, -40, 40, 110, 180, 250, 295];
   } else {
     pos = [-595, -500, -360, -220, -60, 80, 220, 360, 500, 595];
   }

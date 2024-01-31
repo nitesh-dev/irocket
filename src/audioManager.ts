@@ -6,7 +6,7 @@ var constraints = { audio: true }; // add video constraints if required
 let isPermissionAllowed = true;
 
 export function loadAudio() {
-      addAudios();
+  addAudios();
 }
 
 function addAudios() {
@@ -45,7 +45,7 @@ function addAudios() {
   sound.add("engine-loop", {
     url: "./assets/audio/engine2.mp3",
     preload: true,
-  })
+  });
 
   sound.add("finish", {
     url: "./assets/audio/finishMusic.mp3",

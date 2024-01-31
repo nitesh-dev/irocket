@@ -6,25 +6,7 @@ var constraints = { audio: true }; // add video constraints if required
 let isPermissionAllowed = true;
 
 export function loadAudio() {
-  navigator.mediaDevices
-    .getUserMedia(constraints)
-    .then((stream) => {
-      isPermissionAllowed = true;
       addAudios();
-    })
-    .catch((err) => {
-      /* handle the error */
-      console.log(err);
-      addAudios()
-    });
-
-    // addAudios()
-//   navigator.mediaDevices
-//     .getUserMedia(constraints)
-//     .then(() => {})
-//     .catch(() => {
-//       console.log("Failed to load audio");
-//     });
 }
 
 function addAudios() {
